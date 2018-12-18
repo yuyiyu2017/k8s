@@ -33,8 +33,8 @@ kubectl rolling-update redis-master --image=redis-master:2.0
 ```
 kubectl get rc
 ```
-> kubectl会给 RC 增加一个 key 为 "deployment" 的标签，其值为 hash 计算后的值
-> 可通过 --deployment-label-key 参数修改 key 名
+> kubectl会给 RC 增加一个 key 为 "deployment" 的标签，其值为 hash 计算后的值;
+> 可通过 --deployment-label-key 参数修改 key 名.
 
 * 如果中途发现配置有误，可以中断更新，并回滚
 ```
@@ -82,5 +82,5 @@ spec:
 >>name: redis-master-v2
 
 >在 selector 中至少有一个Label与旧的 RC 的 Label 不同，以标识其为新的 RC
->>本例为新增一个 version 的 Label
+>>本例为新增一个 version 的 Label:
 >>version: v2
