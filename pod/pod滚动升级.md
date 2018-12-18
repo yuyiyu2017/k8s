@@ -48,9 +48,9 @@ kubectl rolling-update-rollback
 ```
 kubectl rolling-update redis-master -f redis-master-controller-v2.yaml
 ```
-```
-vim redis-master-controller-v2.yaml
-```
+
+* vim redis-master-controller-v2.yaml
+
 ```yaml
 apiVersion: v1
 kind: ReplicationController
