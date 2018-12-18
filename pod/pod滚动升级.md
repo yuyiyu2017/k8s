@@ -1,7 +1,7 @@
-###1、滚动升级过程
+# 1、滚动升级过程
 >旧的pod从副本数减少到0，新的pod从0对应增加到目标数
 
-###2、针对deploy的升级
+# 2、针对deploy的升级
 * 更新deployment的配置
 ```
 kubectl set image deployment/nginx nginx=nginx:1.12 --record=true
@@ -24,7 +24,7 @@ kubectl rollout undo deployment/nginx
 >--to-version=3  可以指定回滚到的版本
 
 
-###3、针对rc的升级
+# 3、针对rc的升级
 * 将 redis-master 从 1.0 提升为 2.0
 ```
 kubectl rolling-update redis-master --image=redis-master:2.0
@@ -34,7 +34,7 @@ kubectl rolling-update redis-master --image=redis-master:2.0
 kubectl get rc
 ```
 > kubectl会给 RC 增加一个 key 为 "deployment" 的标签，其值为 hash 计算后的值
-可通过 --deployment-label-key 参数修改 key 名
+  可通过 --deployment-label-key 参数修改 key 名
 
 * 如果中途发现配置有误，可以中断更新，并回滚
 ```
@@ -83,4 +83,4 @@ spec:
 
 >在 selector 中至少有一个Label与旧的 RC 的 Label 不同，以标识其为新的 RC
 >>本例为新增一个 version 的 Label
->>version: v2
+>>  version: v2
