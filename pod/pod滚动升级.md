@@ -43,7 +43,7 @@ kubectl rolling-update-rollback
 >新的 RC 将使用旧的 RC 的名字
 
 
-###4、通过yaml文件完成滚动升级
+# 4、通过yaml文件完成滚动升级
 
 ```
 kubectl rolling-update redis-master -f redis-master-controller-v2.yaml
