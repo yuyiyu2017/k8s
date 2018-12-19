@@ -6,15 +6,15 @@
 https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG-1.13.md
 ```
 ```bash
-mkdir -p /data/k8s/apiserver/{bin,cfg,ssl}
+mkdir -p /data/k8s/master/{bin,cfg,ssl}
 tar xzf kubernetes-server-linux-amd64.tar.gz
 cd kubernetes/server/bin
-cp kube-apiserver kube-scheduler kube-controller-manager kubectl /data/k8s/apiserver/bin
+cp kube-apiserver kube-scheduler kube-controller-manager kubectl /data/k8s/master/bin
 ```
 
 # 二、创建token文件，用于后续node节点证书签发
 
-* vim /data/k8s/apiserver/cfg/token.csv
+* vim /data/k8s/master/cfg/token.csv
 >d2CoHk0Q0rI3bsOICdOY1Q,kubelet-bootstrap,10001,"system:kubelet-bootstrap"
 >>第一列：随机字符串，自己可生成
 >>>openssl rand -base64 16
@@ -122,7 +122,7 @@ cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kube
 ```
 
 ```bash
-cp ca-key.pem ca.pem server-key.pem server.pem /data/k8s/apiserver/ssl
+cp ca-key.pem ca.pem server-key.pem server.pem /data/k8s/master/ssl
 ```
 
 * vim admin-csr.json
@@ -153,7 +153,7 @@ cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kube
 
 # 四、部署api-server
 ## 1、添加api-server的配置文件
-* vim /data/k8s/apiserver/cfg/kube-apiserver 
+* vim /data/k8s/master/cfg/kube-apiserver 
 
 ```bash
 KUBE_APISERVER_OPTS="--logtostderr=true \
@@ -167,12 +167,12 @@ KUBE_APISERVER_OPTS="--logtostderr=true \
 --enable-admission-plugins=NamespaceLifecycle,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota,NodeRestriction \
 --authorization-mode=RBAC,Node \
 --enable-bootstrap-token-auth \
---token-auth-file=/data/k8s/apiserver/cfg/token.csv \
+--token-auth-file=/data/k8s/master/cfg/token.csv \
 --service-node-port-range=30000-50000 \
---tls-cert-file=/data/k8s/apiserver/ssl/server.pem  \
---tls-private-key-file=/data/k8s/apiserver/ssl/server-key.pem \
---client-ca-file=/data/k8s/apiserver/ssl/ca.pem \
---service-account-key-file=/data/k8s/apiserver/ssl/ca-key.pem \
+--tls-cert-file=/data/k8s/master/ssl/server.pem  \
+--tls-private-key-file=/data/k8s/master/ssl/server-key.pem \
+--client-ca-file=/data/k8s/master/ssl/ca.pem \
+--service-account-key-file=/data/k8s/master/ssl/ca-key.pem \
 --etcd-cafile=/data/k8s/etcd/ssl/ca.pem \
 --etcd-certfile=/data/k8s/etcd/ssl/server.pem \
 --etcd-keyfile=/data/k8s/etcd/ssl/server-key.pem"
@@ -205,8 +205,8 @@ Description=Kubernetes API Server
 Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
-EnvironmentFile=-/data/k8s/apiserver/cfg/kube-apiserver
-ExecStart=/data/k8s/apiserver/bin/kube-apiserver $KUBE_APISERVER_OPTS
+EnvironmentFile=-/data/k8s/master/cfg/kube-apiserver
+ExecStart=/data/k8s/master/bin/kube-apiserver $KUBE_APISERVER_OPTS
 Restart=on-failure
 
 [Install]
@@ -221,7 +221,7 @@ systemctl restart kube-apiserver
 
 # 五、部署scheduler
 ## 1、添加scheduler的配置文件
-* vim /data/k8s/apiserver/cfg/kube-scheduler 
+* vim /data/k8s/master/cfg/kube-scheduler 
 ```bash
 KUBE_SCHEDULER_OPTS="--logtostderr=true \
 --v=4 \
@@ -240,8 +240,8 @@ Description=Kubernetes Scheduler
 Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
-EnvironmentFile=-/data/k8s/apiserver/cfg/kube-scheduler
-ExecStart=/data/k8s/apiserver/bin/kube-scheduler $KUBE_SCHEDULER_OPTS
+EnvironmentFile=-/data/k8s/master/cfg/kube-scheduler
+ExecStart=/data/k8s/master/bin/kube-scheduler $KUBE_SCHEDULER_OPTS
 Restart=on-failure
 
 [Install]
@@ -256,7 +256,7 @@ systemctl restart kube-scheduler
 
 # 六、部署controller-manager
 ## 1、添加controller-manager的配置文件
-* vim /data/k8s/apiserver/cfg/kube-controller-manager
+* vim /data/k8s/master/cfg/kube-controller-manager
 
 ```bash
 KUBE_CONTROLLER_MANAGER_OPTS="--logtostderr=true \
@@ -266,10 +266,10 @@ KUBE_CONTROLLER_MANAGER_OPTS="--logtostderr=true \
 --address=127.0.0.1 \
 --service-cluster-ip-range=10.0.0.0/24 \
 --cluster-name=kubernetes \
---cluster-signing-cert-file=/data/k8s/apiserver/ssl/ca.pem \
---cluster-signing-key-file=/data/k8s/apiserver/ssl/ca-key.pem  \
---root-ca-file=/data/k8s/apiserver/ssl/ca.pem \
---service-account-private-key-file=/data/k8s/apiserver/ssl/ca-key.pem \
+--cluster-signing-cert-file=/data/k8s/master/ssl/ca.pem \
+--cluster-signing-key-file=/data/k8s/master/ssl/ca-key.pem  \
+--root-ca-file=/data/k8s/master/ssl/ca.pem \
+--service-account-private-key-file=/data/k8s/master/ssl/ca-key.pem \
 --experimental-cluster-signing-duration=87600h0m0s"
 ```
 ## 2、将controller-manager添加为系统服务
@@ -281,8 +281,8 @@ Description=Kubernetes Controller Manager
 Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
-EnvironmentFile=-/data/k8s/apiserver/cfg/kube-controller-manager
-ExecStart=/data/k8s/apiserver/bin/kube-controller-manager $KUBE_CONTROLLER_MANAGER_OPTS
+EnvironmentFile=-/data/k8s/master/cfg/kube-controller-manager
+ExecStart=/data/k8s/master/bin/kube-controller-manager $KUBE_CONTROLLER_MANAGER_OPTS
 Restart=on-failure
 
 [Install]

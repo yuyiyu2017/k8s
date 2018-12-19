@@ -90,7 +90,7 @@ systemctl enable docker
 # 六、添加命令目录到环境变量
 * vim /etc/profile
 ```
-PATH=$PATH:/data/k8s/apiserver/bin:/data/k8s/etcd/bin:/data/k8s/node/bin
+PATH=$PATH:/data/k8s/master/bin:/data/k8s/etcd/bin:/data/k8s/node/bin
 ```
 
 # 七、安装Flannel网络
