@@ -100,3 +100,5 @@ PATH=$PATH:/data/k8s/master/bin:/data/k8s/etcd/bin:/data/k8s/node/bin
 # 九、部署node，kubelet、kube-proxy
 
 # 十、master高可用方案
+
+# 十一、如果需要远程管理集群，参照《远程kubectl》

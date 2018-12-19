@@ -126,7 +126,7 @@ cp ca-key.pem ca.pem server-key.pem server.pem /data/k8s/master/ssl
 ```
 
 * vim admin-csr.json
->用于后续 kubectl 命令管理的证书，与第八步相关
+>用于后续 kubectl 命令远程管理的证书
 ```
 {
   "CN": "admin",
