@@ -8,6 +8,7 @@ kubectl create clusterrolebinding kubelet-bootstrap \
 # 二、生成proxy证书
 
 ```bash
+mkdir -p /data/k8s/node/{bin,cfg,ssl}
 cd /data/k8s/cfssl/api-cert
 ```
 
@@ -50,7 +51,7 @@ cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kube
 >server.pem
 
 ```bash
-cp *.pem /data/k8s/node/ssl
+cp ca*.pem kube*.pem server*.pem  /data/k8s/node/ssl
 ```
 
 # 三、创建kubeconfig文件
@@ -122,12 +123,13 @@ cp bootstrap.kubeconfig kube-proxy.kubeconfig /data/k8s/node/cfg/
 # 四、部署kubelet组件
 
 ## 1、将二进制包中命令复制到对应位置
-    mkdir -p /data/k8s/node/{bin,cfg,ssl}
-    cp kubelet kube-proxy /data/k8s/node/bin
+```bash
+cp kubelet kube-proxy /data/k8s/node/bin
+```
 
 ## 2、添加kubelet的配置文件
 * vim /data/k8s/node/cfg/kubelet
-
+>修改--hostname-override为node本机地址
 ```bash
 KUBELET_OPTS="--logtostderr=true \
 --v=4 \
@@ -149,6 +151,7 @@ KUBELET_OPTS="--logtostderr=true \
 
 ## 3、kubelet辅助配置文件
 * vim /data/k8s/node/cfg/kubelet.config
+* >修改address为node本机地址
 ```yaml
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
@@ -206,14 +209,25 @@ kubectl get csr
 * 根据请求签名
 
 ```bash
-kubectl certificate approve {Node的名称}
+kubectl certificate approve {Node的请求名称}
 kubectl get node
+```
+* 如果设置错误的处理
+
+```bash
+# 删除对应的csr
+kubectl delete csr {Node的请求名称}
+
+# 对应节点的ssl目录删除自动生成的密钥
+rm kubelet-client* kubelet.crt kubelet.key
+
+# 重启 kubelet 然后重新签名
 ```
 
 # 五、部署kube-proxy组件
 ## 1、添加kube-proxy的配置文件
 * vim /data/k8s/node/cfg/kube-proxy
-
+>修改--hostname-override为node本机地址
 ```bash
 KUBE_PROXY_OPTS="--logtostderr=true \
 --v=4 \
