@@ -7,7 +7,7 @@ wget https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/re
 ## 2、修改 image 为谷歌的镜像源
 ```
 #image: k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.0
-image: anjia0532/google-containers.kubernetes-dashboard-amd64:v1.10.0
+image: docker.io/anjia0532/google-containers.kubernetes-dashboard-amd64:v1.10.0
 ```
 
 ## 3、添加对外暴露端口
@@ -25,10 +25,10 @@ spec:
 
 ## 4、语言默认与浏览器相关，强制指定为英文
 ```
-image: anjia0532/google-containers.kubernetes-dashboard-amd64:v1.10.0
+image: docker.io/anjia0532/google-containers.kubernetes-dashboard-amd64:v1.10.0
 env:
-  - name: ACCEPT_LANGUAGE
-    value: english
+- name: ACCEPT_LANGUAGE
+  value: english
 ```
 
 ## 5、应用yaml文件
