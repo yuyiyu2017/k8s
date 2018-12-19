@@ -302,13 +302,23 @@ kubectl get cs
 ```
 >服务均为 Healthy
 
-# 八、如果后续要进入pod中，需创建认证
+# 八、Pod操作权限
 ## 1、权限报错
 ```bash
+kubectl logs -n kubernetes-dashboard
 error: unable to upgrade connection: Forbidden (user=system:anonymous, verb=create, resource=nodes, subresource=proxy)
 ```
-## 2、应用权限
+>如果要进入pod或其他操作，需对匿名用户创建认证
+>
+>与 /data/k8s/node/cfg/kubelet.config 中对应
+```
+authentication:
+  anonymous:
+    enabled: true 
+```
 
+## 2、应用权限
+* yaml文件创建权限绑定
 ```
 kubectl create -f anonymous.yaml
 ```
@@ -328,5 +338,13 @@ subjects:
     kind: User
     name: system:anonymous
 ```
+* 命令创建权限绑定
+```
+kubectl create clusterrolebinding cluster-system-anonymous --clusterrole=cluster-admin --user=system:anonymous
+```
+>cluster-system-anonymous 为绑定的名称
+>
+>cluster-admin 为系统的管理权限
+>
+>system:anonymous 为需要绑定的用户为匿名用户
 
->这个账号拥有完整权限，仅供测试使用
