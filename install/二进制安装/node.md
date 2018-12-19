@@ -5,14 +5,64 @@ kubectl create clusterrolebinding kubelet-bootstrap \
   --user=kubelet-bootstrap
 ```
 
-# 二、创建kubeconfig文件
+# 二、生成proxy证书
+
+```bash
+cd /data/k8s/cfssl/api-cert
+```
+
+* vim kube-proxy-csr.json
+
+```
+{
+  "CN": "system:kube-proxy",
+  "hosts": [],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "CN",
+      "L": "BeiJing",
+      "ST": "BeiJing",
+      "O": "k8s",
+      "OU": "System"
+    }
+  ]
+}
+```
+
+```bash
+cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-proxy-csr.json | cfssljson -bare kube-proxy
+```
+
+>ca-key.pem
+>
+>ca.pem
+>
+>kube-proxy-key.pem
+>
+>kube-proxy.pem
+>
+>server-key.pem
+>
+>server.pem
+
+```bash
+cp *.pem /data/k8s/node/ssl
+```
+
+# 三、创建kubeconfig文件
 
 ```bash
 cd /data/k8s/cfssl/api-cert/
 ```
 
 * vim node_config.sh
-
+>BOOTSTRAP_TOKEN的值与token.csv一致
+>
+>如果master高可用，需要修改KUBE_APISERVER为VIP的地址
 ```bash
 # 创建kubelet bootstrapping kubeconfig 
 BOOTSTRAP_TOKEN=d2CoHk0Q0rI3bsOICdOY1Q
@@ -67,54 +117,6 @@ kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
 
 ```
 cp bootstrap.kubeconfig kube-proxy.kubeconfig /data/k8s/node/cfg/
-```
-
-# 三、生成proxy证书
-
-```bash
-cd /data/k8s/cfssl/api-cert
-```
-
-* vim kube-proxy-csr.json
-
-```
-{
-  "CN": "system:kube-proxy",
-  "hosts": [],
-  "key": {
-    "algo": "rsa",
-    "size": 2048
-  },
-  "names": [
-    {
-      "C": "CN",
-      "L": "BeiJing",
-      "ST": "BeiJing",
-      "O": "k8s",
-      "OU": "System"
-    }
-  ]
-}
-```
-
-```bash
-cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-proxy-csr.json | cfssljson -bare kube-proxy
-```
-
->ca-key.pem
->
->ca.pem
->
->kube-proxy-key.pem
->
->kube-proxy.pem
->
->server-key.pem
->
->server.pem
-
-```bash
-cp *.pem /data/k8s/node/ssl
 ```
 
 # 四、部署kubelet组件
