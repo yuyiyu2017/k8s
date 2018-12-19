@@ -1,7 +1,9 @@
 # 一、下载master包
->里面会包含node和client等包
+>选择下载二进制server包，里面会包含node和client等包
+>
+>kubernetes-server-linux-amd64.tar.gz
 ```bash
-https://storage.googleapis.com/kubernetes-release/release/v1.12.3/kubernetes-server-linux-amd64.tar.gz
+https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG-1.13.md
 ```
 ```bash
 mkdir -p /data/k8s/apiserver/{bin,cfg,ssl}
