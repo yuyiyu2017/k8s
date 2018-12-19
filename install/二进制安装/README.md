@@ -5,7 +5,9 @@
 >
 >flannel
 >>ca.pem  server.pem   server-key.pem
->
+
+**etcd与k8s集群证书不是一套**
+
 >kube-apiserver
 >>ca.pem  server.pem   server-key.pem
 >

@@ -16,7 +16,10 @@ cp kube-apiserver kube-scheduler kube-controller-manager kubectl /data/k8s/apise
 
 * vim /data/k8s/apiserver/cfg/token.csv
 >d2CoHk0Q0rI3bsOICdOY1Q,kubelet-bootstrap,10001,"system:kubelet-bootstrap"
->>第一列：随机字符串，自己可生成，openssl rand -base64 16
+>>第一列：随机字符串，自己可生成
+>>>openssl rand -base64 16
+>>>
+>>>head -c 16 /dev/urandom | od -An -t x | tr -d ' '
 >>
 >>第二列：用户名
 >>
