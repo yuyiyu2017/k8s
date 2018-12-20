@@ -202,3 +202,19 @@ systemctl enable etcd
 --endpoints="https://192.168.112.171:2379,https://192.168.112.172:2379,https://192.168.112.173:2379" \
 cluster-health
 ```
+
+# 六、etcd常规用法
+>etcdctl命令有两个版本用法，默认为v2
+>>Set environment variable ETCDCTL_API=3 to use v3 API or ETCDCTL_API=2 to use v2 API.
+
+* 查看etcd所有键
+```
+export ETCDCTL_API=3
+etcdctl --cacert=/data/k8s/etcd/ssl/ca.pem --cert=/data/k8s/etcd/ssl/server.pem --key=/data/k8s/etcd/ssl/server-key.pem --endpoints="https://192.168.112.171:2379,https://192.168.112.172:2379,https://192.168.112.173:2379" get / --prefix --keys-only
+```
+
+* 查看某个键的值
+```
+export ETCDCTL_API=3
+etcdctl --cacert=/data/k8s/etcd/ssl/ca.pem --cert=/data/k8s/etcd/ssl/server.pem --key=/data/k8s/etcd/ssl/server-key.pem --endpoints="https://192.168.112.171:2379,https://192.168.112.172:2379,https://192.168.112.173:2379" get /registry/services/specs/default/webapp4  -w simple
+```
