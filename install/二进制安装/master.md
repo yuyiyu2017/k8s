@@ -164,7 +164,7 @@ KUBE_APISERVER_OPTS="--logtostderr=true \
 --advertise-address=192.168.112.171 \
 --allow-privileged=true \
 --service-cluster-ip-range=10.0.0.0/24 \
---enable-admission-plugins=NamespaceLifecycle,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota,NodeRestriction \
+--enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota \
 --authorization-mode=RBAC,Node \
 --enable-bootstrap-token-auth \
 --token-auth-file=/data/k8s/master/cfg/token.csv \
