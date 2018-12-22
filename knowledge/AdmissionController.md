@@ -1,7 +1,7 @@
 ## 1、准入控制器（Admission Controller）
->位于 API Server 中，在对象被持久化之前，准入控制器拦截对 API Server 的请求，一般用来做身份验证和授权。
+>位于 API Server 中，在对象被持久化之前，准入控制器拦截对 API Server 的请求，一般用来做身份验证和授权
 >
->其中包含两个特殊的控制器：MutatingAdmissionWebhook 和 ValidatingAdmissionWebhook。
+>其中包含两个特殊的控制器：MutatingAdmissionWebhook 和 ValidatingAdmissionWebhook
 >>变更（Mutating）准入控制：修改请求的对象
 >>
 >>验证（Validating）准入控制：验证请求的对象
@@ -12,8 +12,8 @@
 # 查看所有可用插件
 kube-apiserver -h | grep enable-admission-plugins
 ```
-* **AlwaysAdmit：**允许所有请求通过
-* **AlwaysDeny：**禁止所有请求通过
+* **AlwaysAdmit：**
+* **AlwaysDeny：**
 * **AlwaysPullImages：**
 ```
 在启动容器之前总是去下载镜像，相当于每当容器启动前做一次用于是否有权使用该容器镜像的检查
