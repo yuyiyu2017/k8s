@@ -20,10 +20,12 @@ kube-apiserver -h | grep enable-admission-plugins
 ```
 * **DefaultStorageClass：**
 ```
-这个插件观察不指定 storage class 字段的 PersistentVolumeClaim 对象的创建，并自动向它们添加默认的 storage class，因此不指定 storage class 字段的用户根本无需关心它们，它们将得到默认的 storage class
+这个插件观察不指定 storage class 字段的 PersistentVolumeClaim 对象的创建，并自动向它们添加默认的 storage class
+因此不指定 storage class 字段的用户根本无需关心它们，它们将得到默认的 storage class
 
 当没有配置默认 storage class 时，这个插件不会执行任何操作
-当一个以上的 storage class 被标记为默认时，它拒绝 PersistentVolumeClaim 创建并返回一个错误，管理员必须重新检查 StorageClass 对象，并且只标记一个作为默认值
+当一个以上的 storage class 被标记为默认时，它拒绝 PersistentVolumeClaim 创建并返回一个错误
+管理员必须重新检查 StorageClass 对象，并且只标记一个作为默认值
 
 这个插件忽略了任何 PersistentVolumeClaim 更新，它只对创建起作用
 ```
@@ -56,7 +58,8 @@ Pod初始化的准入控制器，详情请参考动态准入控制
 ```
 * **LimitPodHardAntiAffinityTopology：**
 ```
-拒绝任何在 requiredDuringSchedulingRequiredDuringExecution 的 AntiAffinity 字段中定义除了kubernetes.io/hostname 之外的拓扑关键字的 pod
+拒绝任何在 requiredDuringSchedulingRequiredDuringExecution 的 AntiAffinity 字段中
+定义除了kubernetes.io/hostname 之外的拓扑关键字的 pod
 ```
 * **LimitRanger：**
 ```
@@ -137,7 +140,9 @@ SecurityContext包含在容器中定义了操作系统级别的安全选型如fs
 ```
 * **PersistentVolumeClaimResize：**
 ```
-该StorageObjectInUseProtection插件将kubernetes.io/pvc-protection或kubernetes.io/pv-protection终结器添加到新创建的持久卷声明（PVC）或持久卷（PV）
+该StorageObjectInUseProtection插件将kubernetes.io/pvc-protection或kubernetes.io/pv-protection终结器
+添加到新创建的持久卷声明（PVC）或持久卷（PV）
+
 在用户删除PVC或PV的情况下，PVC或PV不会被移除，直到PVC或PV保护控制器从PVC或PV中移除终结器
 ```
 * **ValidatingAdmissionWebhook：**
