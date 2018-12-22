@@ -1,8 +1,10 @@
-## 1、概念
-**准入控制器（Admission Controller）**位于 API Server 中，在对象被持久化之前，准入控制器拦截对 API Server 的请求，一般用来做身份验证和授权。其中包含两个特殊的控制器：MutatingAdmissionWebhook 和 ValidatingAdmissionWebhook。
->**变更（Mutating）准入控制：**修改请求的对象
+## 1、准入控制器（Admission Controller）
+>位于 API Server 中，在对象被持久化之前，准入控制器拦截对 API Server 的请求，一般用来做身份验证和授权。
 >
->**验证（Validating）准入控制：**验证请求的对象
+>其中包含两个特殊的控制器：MutatingAdmissionWebhook 和 ValidatingAdmissionWebhook。
+>>变更（Mutating）准入控制：修改请求的对象
+>>
+>>验证（Validating）准入控制：验证请求的对象
 
 ## 2、配置解释
 
@@ -158,14 +160,14 @@ SecurityContext.RunAsUser is forbidden
 ## 5、ImagePolicyWebhook配置
 ### a、配置文件格式
 >ImagePolicyWebhook 插件使用了admission config 文件 --admission-control-config-file 来为后端行为设置配置选项
-```json
+```
 {
   "imagePolicy": {
      "kubeConfigFile": "path/to/kubeconfig/for/backend",
-     "allowTTL": 50,           // time in s to cache approval
-     "denyTTL": 50,            // time in s to cache denial
-     "retryBackoff": 500,      // time in ms to wait between retries
-     "defaultAllow": true      // determines behavior if the webhook backend fails
+     "allowTTL": 50,           # time in s to cache approval
+     "denyTTL": 50,            # time in s to cache denial
+     "retryBackoff": 500,      # time in ms to wait between retries
+     "defaultAllow": true      # determines behavior if the webhook backend fails
   }
 }
 ```
@@ -198,7 +200,7 @@ users:
 
 * 请求载荷例子：
 
-```json
+```
 {  
   "apiVersion":"imagepolicy.k8s.io/v1alpha1",
   "kind":"ImageReview",
