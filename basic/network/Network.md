@@ -41,14 +41,30 @@ Mesos CNI
 
 # 三、Flannel网络原理
 
-
 >通过修改docker启动项，给每个节点的docker分配相互不想冲突的IP地址
 >
 >给这些IP地址之间建立一个覆盖网络，同过覆盖网络，将数据包原封不动的传递到目标容器内
 >
->属于覆盖网络overlaynetwork的一种
+>每台主机一个CIDR，三层互通，属于覆盖网络overlaynetwork的一种
 ![Alt text](./docker.png)
 ![Alt text](./Flannel网络原理.png)
 ![Alt text](./Flannel数据包.png)
+>Flannel实现过程参照二进制安装
 
-# 四、Flannel实现过程参照二进制安装
+# 四、Calico网络原理
+
+* Felix，Calico Agent
+>跑在每台需要运行Workload的节点上，主要负责配置路由及ACLs等信息来确保Endpoint的连通状态
+* etcd
+>分布式键值存储，主要负责网络元数据一致性，确保Calico网络状态的准确性
+* BGP Client(BIRD)
+>主要负责把Felix写入Kernel的路由信息分发到当前Calico网络，确保Workload间的通信的有效性
+* BGP Route Reflector(BIRD)
+>大规模部署时使用，摒弃所有节点互联的 mesh 模式，通过一个或者多个BGP Route Reflector来完成集中式的路由分发
+![Alt text](./Calico架构图.png)
+![Alt text](./Calico网络图.png)
+
+
+
+
+
