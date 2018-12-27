@@ -1,4 +1,4 @@
-## 一、Service 的类型
+# 一、Service 的类型
 >指定 Service 的访问方式，默认为 ClusterIP
 
 * ClusterIP：
@@ -10,8 +10,10 @@
 * LoadBalancer：
 >使用外接负载均衡器完成服务的负载分发，需要在 spec.status.loadBalancer 字段指定外部负载均衡器IP， 并同时定义 nodePort 和 clusterIP，用于公有云环境"
 
+* ExternalName：
+>使用类似DNS域名来匹配service，而不使用标准的selector选择器
 
-## 二、service中的三层端口
+# 二、service中的三层端口
 
 ```
 ports:
@@ -29,7 +31,7 @@ ports:
 * 宿主机的端口
 >nodePort: 33062
 
-### 1、创建容器，并指定容器的端口
+## 1、创建容器，并指定容器的端口
 
 * vim webapp-rc.yaml
 
@@ -53,7 +55,7 @@ spec:
         - containerPort: 80
 ```
 
-### 2、查看容器的端口
+## 2、查看容器的端口
 * kubectl describe pod webapp-kctg7
 ```
 Name:               webapp-kctg7
@@ -65,7 +67,7 @@ Containers:
     Port:           80/TCP
 ```
 
-### 3、关联proxy与容器的端口
+## 3、关联proxy与容器的端口
 * 使用yaml文件
 >kubectl create -f webapp-svc.yaml
 ```
@@ -97,7 +99,7 @@ spec:
 >>|:--:|:--:|:--:|:--:|:--:|
 >>|webapp2|ClusterIP|10.0.0.179|<none>|99/TCP|
 
-### 4、关联宿主机与proxy和容器的端口
+## 4、关联宿主机与proxy和容器的端口
 * 使用yaml文件
 >修改 type 为 NodePort，如果不指定 nodePort: 30003 ，将随机分配端口
 >
@@ -125,7 +127,7 @@ spec:
 >>|:--:|:--:|:--:|:--:|:--:|
 >>|webapp3|NodePort|10.0.0.3|<none>|8081:34098/TCP|
 
-### 5、查看service信息
+## 5、查看service信息
 * kubectl describe svc webapp4 
 ```bash
 Name:                     webapp4
@@ -155,7 +157,7 @@ Events:                   <none>
 >通过宿主机的IP和端口访问
 >>curl 127.0.0.1:34098
 
-## 三、负载均衡策略
+# 三、负载均衡策略
 * RoundRobin
 >轮询模式，默认
 >
@@ -188,7 +190,7 @@ spec:
 >然后客户端程序需要实现自己的负载分发策略，来确定访问的后端 Pod
 
 
-## 四、service多端口和多协议
+# 四、service多端口和多协议
 >对 Service 设置两个端口号，每个端口号进行命名
 ```yaml
 apiVersion: v1
@@ -231,9 +233,9 @@ spec:
     protocol: TCP
 ```
 
-## 五、直接绑定宿主机与容器的端口
+# 五、直接绑定宿主机与容器的端口
 
-### 1、将 Pod 端口号映射到物理机
+## 1、将 Pod 端口号映射到物理机
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -251,7 +253,7 @@ spec:
 ```
 >直接访问物理机 IP:8081 即可访问 Pod
 
-### 2、直接使用物理机的网络
+## 2、直接使用物理机的网络
 
 ```yaml
 apiVersion: v1
@@ -275,7 +277,7 @@ spec:
 >>如果指定了 hostPort，则 hostPort 必须等于 containerPort
 
 
-## 六、外部负载均衡器
+# 六、外部负载均衡器
 >通过设置 LoadBalancer 映射到云服务器提供的 LoadBalancer 地址
 ```yaml
 apiVersion: v1
@@ -300,7 +302,7 @@ status:
 ```
 >来自外部负载均衡器的流量将直接打到 backend Pod 上，不过实际它们是如何工作的，这要依赖于云提供商。 在这些情况下，将根据用户设置的 loadBalancerIP 来创建负载均衡器。 某些云提供商允许设置 loadBalancerIP。如果没有设置 loadBalancerIP，将会给负载均衡器指派一个临时 IP。 如果设置了 loadBalancerIP，但云提供商并不支持这种特性，那么设置的 loadBalancerIP 值将会被忽略掉
 
-## 七、无标签选择的Service
+# 七、无标签选择的Service
 
 >某些时候，应用系统需要将一个外部数据库作为后端服务进行连接，或将另一个集群或 Namespace 中的服务作为服务的后端，通过创建一个无 Label Selector 的 Service来实现
 >>Endpoint IP 地址不能是 loopback（127.0.0.0/8） link-local（169.254.0.0/16） link-local 多播（224.0.0.0/24）
@@ -331,3 +333,17 @@ subsets:
   - port: 9090
 ```
 >访问没有 selector 的 Service，与有 selector 的 Service 的原理相同。请求将被路由到用户定义的 Endpoint（该示例中为 1.2.3.4:9090）
+
+# 八、ExternalName示例
+>通过CNAME将service（此处my-service）与externalName(my.database.example.com)映射起来
+```yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: my-service
+  namespace: prod
+spec:
+  type: ExternalName
+  externalName: my.database.example.com
+```
+
