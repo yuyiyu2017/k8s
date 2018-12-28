@@ -308,7 +308,7 @@ status:
 >某些时候，应用系统需要将一个外部数据库作为后端服务进行连接，或将另一个集群或 Namespace 中的服务作为服务的后端，通过创建一个无 Label Selector 的 Service来实现
 
 * Endpoint方式
->>Endpoint IP 地址不能是 loopback（127.0.0.0/8） link-local（169.254.0.0/16） link-local 多播（224.0.0.0/24）
+>Endpoint IP 地址不能是 loopback（127.0.0.0/8） link-local（169.254.0.0/16） link-local 多播（224.0.0.0/24）
 ```yaml
 apiVersion: v1
 kind: Service
