@@ -350,3 +350,40 @@ spec:
   externalName: my.database.example.com
 ```
 
+# 八、ClusterIP为空
+>创建指定ClusterIP为空时，将跳过proxy层的IP，直接网络路径至后端Pod
+## 1、创建时的写法
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-svc
+spec:
+  ports:
+  - port: 88
+    targetPort: 80
+  clusterIP: "None"
+  selector:
+    app: webapp
+```
+
+## 2、查看service信息
+>kubectl get svc
+>>|NAME|TYPE|CLUSTER-IP|EXTERNAL-IP|PORT(S)|
+>>|:--:|:--:|:--:|:--:|:--:|
+>>|webapp-svc|ClusterIP|None|<none>|88/TCP|
+
+## 3、解析service地址
+>dig -t A webapp-svc.default.svc.cluster.local. @10.0.0.2
+>>域名A记录指向所有的后端Pod地址
+
+
+
+
+
+
+
+
+
+
+
