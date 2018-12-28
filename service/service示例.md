@@ -8,10 +8,12 @@
 >使用宿主机的端口，使能够访问各 Node 的外部客户端通过 Node的 IP 地址和端口号就能访问服务
 
 * LoadBalancer：
->使用外接负载均衡器完成服务的负载分发，需要在 spec.status.loadBalancer 字段指定外部负载均衡器IP， 并同时定义 nodePort 和 clusterIP，用于公有云环境"
+>使用外接负载均衡器完成服务的负载分发，需要在 spec.status.loadBalancer 字段指定外部负载均衡器IP， 并同时定义 nodePort 和 clusterIP，用于公有云环境
 
 * ExternalName：
 >使用类似DNS域名来匹配service，而不使用标准的selector选择器
+>
+>通常用于将集群外部的服务引入集群内部
 
 # 二、service中的三层端口
 
@@ -302,9 +304,10 @@ status:
 ```
 >来自外部负载均衡器的流量将直接打到 backend Pod 上，不过实际它们是如何工作的，这要依赖于云提供商。 在这些情况下，将根据用户设置的 loadBalancerIP 来创建负载均衡器。 某些云提供商允许设置 loadBalancerIP。如果没有设置 loadBalancerIP，将会给负载均衡器指派一个临时 IP。 如果设置了 loadBalancerIP，但云提供商并不支持这种特性，那么设置的 loadBalancerIP 值将会被忽略掉
 
-# 七、无标签选择的Service
-
+# 七、ExternalName
 >某些时候，应用系统需要将一个外部数据库作为后端服务进行连接，或将另一个集群或 Namespace 中的服务作为服务的后端，通过创建一个无 Label Selector 的 Service来实现
+
+* Endpoint方式
 >>Endpoint IP 地址不能是 loopback（127.0.0.0/8） link-local（169.254.0.0/16） link-local 多播（224.0.0.0/24）
 ```yaml
 apiVersion: v1
@@ -334,7 +337,7 @@ subsets:
 ```
 >访问没有 selector 的 Service，与有 selector 的 Service 的原理相同。请求将被路由到用户定义的 Endpoint（该示例中为 1.2.3.4:9090）
 
-# 八、ExternalName示例
+* 映射域名
 >通过CNAME将service（此处my-service）与externalName(my.database.example.com)映射起来
 ```yaml
 kind: Service
