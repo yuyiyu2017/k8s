@@ -45,19 +45,18 @@ kubectl apply -f service-nodeport.yaml
 kubectl get pods --all-namespaces -l app.kubernetes.io/name=ingress-nginx --watch
 ```
 
-# 三、创建nginx和apache及对应的service
+# 三、测试验证
+## 1、创建nginx和apache及对应的service
 
-```
+```bash
 kubectl run --image=nginx nginx
 kubectl run --image=httpd httpd
 kubectl expose deployment nginx --port=80
 kubectl expose deployment httpd --port=80
 ```
 
-# 四、创建ingress
+## 2、创建ingress
 >以虚拟主机（域名）区分两个service
-
-* vim test-ingress.yaml 
 ```yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -79,23 +78,21 @@ spec:
           servicePort: 80           # 与apache的service端口对应
 ```
 
-* 查看ingress
+## 3、查看ingress
 ```
 kubectl get ingresses.extensions
 ```
 
-# 五、验证
-
-## 1、修改hosts文件
+## 4、修改客户端hosts文件
 ```
 C:\Windows\System32\drivers\etc\hosts
 
 192.168.112.171 nginx.web.com
 192.168.112.171 httpd.web.com
 ```
->访问两个域名，分别返回nginx和httpd的首页
+## 5、客户端访问两个域名，分别返回nginx和httpd的首页
 
-# 六、查看配置原理
+# 四、查看配置原理
 
 ## 1、进入ingress容器中
 ```
@@ -121,7 +118,7 @@ upstream default-httpd-80 {
 }
 ```
 
-# 七、ssl的代理
+# 五、ssl的代理
 
 ## 1、创建一对私钥和证书
 * 生成私钥
