@@ -343,9 +343,9 @@ myappdata-myapp-2
 >通过调整N的值，动态控制更新过程
 ```yaml
 spec:
-	updateStrategy:
-		type:
-		rollingUpdate:
-			partition: Int
+  updateStrategy:
+    type:
+      rollingUpdate:
+        partition: Int
 ```
 
