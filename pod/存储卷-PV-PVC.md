@@ -388,7 +388,7 @@ spec:
       claimName: nginx-pvc              # 与PVC名称对应
 ```
 
-# 八、一键创建动态PVC
+# 九、创建动态PVC
 >当pod请求PVC时，PVC会动态创建需要的PV，从而应用到pod中
 
 ## 1、下载项目
