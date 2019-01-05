@@ -1,8 +1,19 @@
 # 一、常用volume类型
 * emptyDir
 * hostPath
-* nfs
-* glusterfs
+* 外部存储
+
+>NAS
+>>nfs和cifs
+
+>SAN
+>>iSCSI
+
+>分布式存储
+>>glusterfs和ceph/cephfs
+
+>云存储
+>>EBS和Azure Disk
 
 # 二、emptyDir
 >在容器中创建一个临时的空目录
@@ -106,7 +117,7 @@ kubectl exec -it volume-pod -c tomcat -- ls /usr/local/tomcat/logs
 kubectl exec -it volume-pod -c busybox
 ```
 
-# 五、NFS
+# 五、NFS例举
 ```yaml
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -134,7 +145,7 @@ spec:
           path: /data/nfs/test1         # nfs的目录
 ```
 
-# 六、glusterfs
+# 六、glusterfs例举
 ## 1、创建gluster集群
 ```
 https://docs.gluster.org/en/latest/Quick-Start-Guide/Quickstart/
@@ -216,7 +227,93 @@ kubectl exec nginx-glusterfs -- mount | grep gluster
 # 七、PV与PVC
 * PV      对存储抽象实现，使得存储作为集群中的资源
 * PVC     PVC消费PV的资源
+![Alt text](./PVC结构.png)
 
+## 1、PV的yaml简略格式
+
+* kubectl explain pv
+>PV属于集群资源，与namespace平级，不能属于namespace
+
+```
+KIND:     PersistentVolume
+VERSION:  v1
+
+FIELDS:
+    apiVersion	<string>
+    kind	<string>
+    
+    metadata	<Object>
+        name
+        labels
+        annotations
+
+    spec	<Object>        # 此字段选项与Pod的spec.volumes类似
+        accessModes <[]string>  # 可以列表指定多个
+        
+        capacity:               # 指定空间大小
+            storage: 5Gi
+
+        persistentVolumeReclaimPolicy:      # 空间回收策略
+            
+    status	<Object>
+```
+
+* accessModes
+```
+ReadWriteOnce       读写挂载单个节点
+ReadOnlyMany        只读挂载多个节点
+ReadWriteMany       读写挂载多个节点
+```
+* persistentVolumeReclaimPolicy
+```
+Retain          默认，不随pod删除而删除，需手动删除
+Recycle         清空PV的数据，其他pod将能使用
+Delete          关联的资产将会被删除，适用于云存储
+```
+
+## 2、PVC的yaml简略格式
+* kubectl explain pvc
+>a、通过 volumeName\volumeMode\selector 选择对应的后端存储
+>
+>b、如果不指定，系统将按请求的存储空间大小任意匹配
+>
+>c、如果没有满足条件的后端存储卷，PVC将处于Pending等待状态
+>
+>d、绑定状态的PV，是无法删除的
+>
+>e、PVC属于namespace，只能被同一namespace资源使用
+
+```
+KIND:     PersistentVolumeClaim
+VERSION:  v1
+
+FIELDS:
+    apiVersion	<string>
+
+    kind	<string>
+
+    metadata	<Object>
+        name
+        namespace
+        labels
+
+    spec	<Object>   
+        accessModes	<[]string>      # 必须是使用PV相应字段的子集
+
+        resources	<Object>        # 请求的资源限制
+            limits          <map[string]string>     # 最大值
+            requests        <map[string]string>     # 最小值
+                storage:
+
+        selector	<Object>        # 选择器
+        storageClassName	<string>
+        volumeMode	<string>        # 后端存储卷的模式
+        volumeName	<string>        # 后端存储卷的名称
+            
+    status	<Object>
+```
+
+# 八、PV-PVC-Pod例举
 ## 1、创建静态PV
 * nfs例举
 ```yaml
@@ -254,18 +351,6 @@ spec:
     endpoints: "glusterfs-cluster"  # 与前面的endpoints对应
     path: "gv0"                     # glusterfs的磁盘名称
     readOnly: false
-```
-* accessModes
-```
-ReadWriteOnce       读写挂载单个节点
-ReadOnlyMany        只读挂载多个节点
-ReadWriteMany       读写挂载多个节点
-```
-* persistentVolumeReclaimPolicy
-```
-Retain          默认，不随pod删除而删除，需手动删除
-Recycle         清空PV的数据，其他pod将能使用
-Delete          关联的资产将会被删除，适用于云存储
 ```
 
 ## 2、创建PVC使用静态PV
@@ -307,7 +392,7 @@ spec:
 >当pod请求PVC时，PVC会动态创建需要的PV，从而应用到pod中
 
 ## 1、下载项目
-https://github.com/kubernetes-incubator/external-storage
+https://github.com/helm/charts
 
 ## 2、创建动态PVC
 
