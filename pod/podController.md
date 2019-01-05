@@ -218,3 +218,134 @@ spec:
 >在 selector 中至少有一个Label与旧的 RC 的 Label 不同，以标识其为新的 RC
 >>version: v2
 
+# 六、StatefulSet
+## 1、有状态服务要求
+
+```
+a、稳定且唯一的网络标识符
+b、稳定且持久的存储
+c、有序、平滑地部署和扩展
+d、有序、平滑地删除和终止
+e、有序地滚动更新
+```
+
+## 2、实现需要地三个组件
+```
+headless service
+StatefulSet
+volumeClaimTemplate
+```
+
+## 3、StatefulSet使用例举
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-svc
+  labels:
+    app: myapp-svc
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    app: myapp-pod
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: myapp
+spec:
+  serviceName: myapp-svc
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp-pod
+  template:
+    metadata:
+      labels:
+        app: myapp-pod
+    spec:
+      containers:
+      - name: myapp
+        image: ikubernetes/myapp:v5
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: myappdata
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata:
+      name: myappdata
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: "nfs-client"
+      resources:
+        requests:
+          storage: 2Gi
+```
+
+## 4、使用解释
+
+* 一个headless的service
+
+```
+# kubectl get svc
+
+myapp-svc   ClusterIP   None   <none>  80/TCP  13m
+```
+
+* Pod名称规则
+>pod名称与containers的name对应，按顺序添加后缀
+```
+# kubectl get pods
+
+myapp-0
+myapp-1
+myapp-2
+```
+
+* Pod访问方式
+>每个pod会被单独分配域名与之对应
+>
+>分配的域名格式
+>>pod_name.service_name.namespace_name.svc.cluster.local.
+```
+# kubectl exec -it myapp-0 -- /bin/sh
+
+/ # nslookup myapp-0
+
+Name:      myapp-0
+Address 1: 172.17.99.5 myapp-0.myapp-svc.default.svc.cluster.local.
+```
+
+* Pod对应的PVC
+>每个pod对应固定名称的pvc
+>
+>名称格式为
+>>volumeClaim_name-pod_name
+
+```
+# kubectl get pvc
+
+myappdata-myapp-0
+myappdata-myapp-1
+myappdata-myapp-2
+```
+
+## 5、StatefulSet滚动更新配置
+
+>当partition为N时，Pod尾号大于等于N的更新，默认为0
+>
+>通过调整N的值，动态控制更新过程
+```yaml
+spec:
+	updateStrategy:
+		type:
+		rollingUpdate:
+			partition: Int
+```
+
