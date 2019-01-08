@@ -125,32 +125,6 @@ cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kube
 cp ca-key.pem ca.pem server-key.pem server.pem /data/k8s/master/ssl
 ```
 
-* vim admin-csr.json
->用于后续 kubectl 命令远程管理的证书
-```
-{
-  "CN": "admin",
-  "hosts": [],
-  "key": {
-    "algo": "rsa",
-    "size": 2048
-  },
-  "names": [
-    {
-      "C": "CN",
-      "L": "Beijing",
-      "ST": "Beijing",
-      "O": "system:masters",
-      "OU": "System"
-    }
-  ]
-}
-```
-
-```
-cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes admin-csr.json | cfssljson -bare admin
-```
-
 # 四、部署api-server
 ## 1、添加api-server的配置文件
 * vim /data/k8s/master/cfg/kube-apiserver 

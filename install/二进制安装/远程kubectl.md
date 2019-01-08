@@ -53,11 +53,42 @@ users:
 ```
 
 ## 7、配置admin证书
->将master文档中创建的证书放入对应位置
->
+* 将master文档中创建的证书放入对应位置
 >/root/.kube/ssl/
 >>ca.pem
 >>
 >>admin.pem
 >>
 >>admin-key.pem
+
+* vim admin-csr.json
+>使用集群根证书签属证书
+>
+>"O": "system:masters" 为Group，"CN": "admin"为User
+```
+{
+  "CN": "admin",
+  "hosts": [],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "CN",
+      "L": "Beijing",
+      "ST": "Beijing",
+      "O": "system:masters",
+      "OU": "System"
+    }
+  ]
+}
+```
+
+```
+cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes admin-csr.json | cfssljson -bare admin
+```
+
+
+
+
