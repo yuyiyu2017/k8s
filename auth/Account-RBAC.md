@@ -267,12 +267,12 @@ mv cfssl-certinfo_linux-amd64 /usr/bin/cfssl-certinfo
     "algo": "rsa",
     "size": 2048
   },
-  "names": [                # 这些信息可以任意填写
+  "names": [
     {
       "C": "CN",
       "L": "Beijing",
       "ST": "Beijing",
-      "O": "k8s",
+      "O": "test-group",    # 如果绑定的是Group，此处与之对应
       "OU": "System"
     }
   ]
@@ -401,4 +401,91 @@ con-test						自定义的上下文名称
 kubectl config use-context con-test
 ```
 >此时，只能对pod进行get、list等操作，不能进行其他操作
+
+# 八、系统默认管理员
+## 1、查看管理员证书
+```
+openssl x509 -in admin.pem -text -noout
+```
+```
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            2a:b8:f0:93:7b:1e:ed:a7:9c:ff:70:9b:40:3e:24:4c:eb:ae:f2:ac
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=CN, ST=Beijing, L=Beijing, O=k8s, OU=System, CN=kubernetes
+        Validity
+            Not Before: Dec 19 05:51:00 2018 GMT
+            Not After : Dec 16 05:51:00 2028 GMT
+        Subject: C=CN, ST=Beijing, L=Beijing, O=system:masters, OU=System, CN=admin
+```
+```
+O=system:masters            Group名称
+CN=admin                    User名称
+```
+
+## 2、查看角色绑定
+```bash
+kubectl get clusterrolebindings.rbac.authorization.k8s.io cluster-admin -o yaml
+```
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  creationTimestamp: "2018-12-19T06:09:01Z"
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: cluster-admin
+  resourceVersion: "96"
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterrolebindings/cluster-admin
+  uid: 94a865a4-0354-11e9-a9ab-000c299085a1
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: system:masters
+```
+
+## 3、查看集群角色
+```
+kubectl get clusterrole cluster-admin -o yaml
+```
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  creationTimestamp: "2018-12-19T06:09:01Z"
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: cluster-admin
+  resourceVersion: "41"
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterroles/cluster-admin
+  uid: 944b4786-0354-11e9-a9ab-000c299085a1
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- nonResourceURLs:
+  - '*'
+  verbs:
+  - '*'
+```
+
+
+
+
+
+
+
 
