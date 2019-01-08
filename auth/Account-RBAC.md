@@ -109,7 +109,7 @@ API group
 ```bash
 curl http://192.168.112.171:8080/api/v1/namespaces
 ```
-```json
+```
 {
   "kind": "NamespaceList",
   "apiVersion": "v1",
@@ -117,7 +117,7 @@ curl http://192.168.112.171:8080/api/v1/namespaces
     "selfLink": "/api/v1/namespaces",
     "resourceVersion": "531001"
   },
-  # ...
+  ...
 }
 ```
 
