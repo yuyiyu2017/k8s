@@ -105,7 +105,7 @@ API group
 >有些资源不属于 namespaces，则没有 namespaces/{namespaceName} 这一节
 
 * 使用示例
-/apis/apps/v1/namespaces/default/deployments/myapp-deploy/
+>/apis/apps/v1/namespaces/default/deployments/myapp-deploy/
 ```bash
 curl http://192.168.112.171:8080/api/v1/namespaces
 ```
