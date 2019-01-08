@@ -47,6 +47,7 @@ c、Account 使用 role ，即可 Operation 操作 Objects
 >可以将用户与集群角色绑定，使 clusterrole 降级到某一名称空间中
 >
 >从而使user具有所在名称空间的绝对权限
+
 ![Alt text](./role与clusterrole关系.png)
 
 # 三、Service Account
@@ -116,7 +117,7 @@ curl http://192.168.112.171:8080/api/v1/namespaces
     "selfLink": "/api/v1/namespaces",
     "resourceVersion": "531001"
   },
-  ...
+  # ...
 }
 ```
 
@@ -258,7 +259,7 @@ mv cfssl-certinfo_linux-amd64 /usr/bin/cfssl-certinfo
 ```
 
 * vim test-csr.json
-```json
+```
 {
   "CN": "test-user",        # 此处名称与用户名User对应
   "hosts": [],
@@ -285,9 +286,9 @@ cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kube
 
 * 文件说明
 ```
-test.csr					# 自动生成的证书请求
-test-key.pem				# test-user用户的私钥
-test.pem					# 集群根证书给test-user签发的证书
+test.csr                    # 自动生成的证书请求
+test-key.pem                # test-user用户的私钥
+test.pem                    # 集群根证书给test-user签发的证书
 ```
 
 ## 3、openssl方式生成User证书
