@@ -482,7 +482,43 @@ rules:
   - '*'
 ```
 
+# 九、dashboard的config制作
+## 1、创建一个拥有一定权限的ServiceAccount，并获取对应token
+```
+kubectl -n kube-system get secret kubernetes-dashboard-token -o jsonpath={.data.token}|base64 -d
+```
 
+## 2、创建config集群
+
+```
+kubectl config set-cluster kubernetes --certificate-authority=/data/k8s/master/ssl/ca.pem --embed-certs=true --kubeconfig=./def-ns-admin.conf  --server="https://192.168.112.171:6443"
+```
+
+```
+--embed-certs=true			使config中的证书路径不显示
+--kubeconfig=				指定输出的config文件
+```
+
+## 3、创建config用户
+
+```
+kubectl config set-credentials def-ns-admin --token="abcd" --kubeconfig=./def-ns-admin.conf
+```
+
+```
+--token=					从ServiceAccount获取的token
+```
+
+## 4、创建config上下文
+
+```
+kubectl config set-context def-ns-admin@kubernetes --cluster=kubernetes --user=def-ns-admin --kubeconfig=./def-ns-admin.conf
+```
+
+## 5、设置config默认上下文
+```
+kubectl config use-context def-ns-admin@kubernetes
+```
 
 
 
