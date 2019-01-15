@@ -1,12 +1,28 @@
 # 一、注册网段
 
->Falnnel要用etcd存储自身一个子网信息，在etcd中写入预定义子网段
+>Flannel要用etcd存储自身一个子网信息，在etcd中写入预定义子网段
 
 ```bash
 /data/k8s/etcd/bin/etcdctl \
 --ca-file=/data/k8s/etcd/ssl/ca.pem --cert-file=/data/k8s/etcd/ssl/server.pem --key-file=/data/k8s/etcd/ssl/server-key.pem \
 --endpoints="https://192.168.112.171:2379,https://192.168.112.172:2379,https://192.168.112.173:2379" \
 set /coreos.com/network/config  '{ "Network": "172.17.0.0/16", "Backend": {"Type": "vxlan"}}'
+```
+
+```
+"Network": "172.17.0.0/16"
+    分配给docker的地址网段
+
+"Backend": {"Type": "vxlan"}
+    flannel使用vxlan模式，overlay封装网络包
+
+"Backend": {"Type": "vxlan", "Directrouting": true}
+    直接使用路由，桥接网络，二层通信
+
+"Backend": {"Type": "host-gw"}
+    Host Gateway，主机网关模式，性能更好，但宿主机不能跨网段
+    各个宿主机的Pod网段不同，将宿主机的网卡当作网关
+    然后按照宿主机的路由表，到达其他宿主机的网关，再到达目标Pod
 ```
 
 # 二、下载安装二进制包
