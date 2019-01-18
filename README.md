@@ -1,11 +1,28 @@
-kubernetes学习记录
+# kubernetes学习记录
+* auth
+>认证体系
+
+* basic
+>基础配件
+
+* install
+>集群安装
+
+* pod
+>Pod相关
+
+* service
+>Service相关
+
+* xls
+>表格整理
 
 # 国外镜像处理
-## 1、国内镜像仓库
+## 1、国内阿里云镜像仓库
 ```
 image: k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.0
 修改为
-image: docker.io/anjia0532/google-containers.kubernetes-dashboard-amd64:v1.10.0
+image: registry.cn-hangzhou.aliyuncs.com/google-containers/kubernetes-dashboard-amd64:v1.10.0
 ```
 
 ## 2、香港自定义镜像
