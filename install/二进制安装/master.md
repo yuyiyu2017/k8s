@@ -78,7 +78,9 @@ mkdir -p /data/k8s/cfssl/api-cert
 ```
 
 * vim server-csr.json
->只要使用了api端口，包括master和负载均衡器及VIP，就需要添加到hosts中
+>只要使用了api端口，包括etcd、master和负载均衡器及VIP，就需要添加到hosts中
+>
+>10.0.0.1 与后续Node中kube-proxy的配置 --cluster-cidr=10.0.0.0/24 相对应
 
 ```
 {
