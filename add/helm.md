@@ -47,6 +47,7 @@ kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"templat
 ```
 
 # 二、Helm
+>参照 https://docs.helm.sh/using_helm/
 ## 1、helm结构
 * 核心术语
 ```
@@ -134,6 +135,7 @@ upgrade     更新一个release
 ```
 
 # 三、Chart
+> 参照 https://docs.helm.sh/developing_charts/#charts
 ## 1、创建chart
 * 创建一个空的chart
 ```
