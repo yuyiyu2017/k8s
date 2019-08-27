@@ -1,13 +1,13 @@
 ## 1、下载yaml文件
 
 ```bash
-wget https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
+wget https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml
 ```
 
 ## 2、修改 image 为谷歌的镜像源
 ```
-#image: k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.0
-image: docker.io/anjia0532/google-containers.kubernetes-dashboard-amd64:v1.10.0
+#image: k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.1
+image: docker.io/yuyiyu/google-containers.kubernetes-dashboard-amd64:v1.10.1
 ```
 
 ## 3、添加对外暴露端口
@@ -25,7 +25,7 @@ spec:
 
 ## 4、语言默认与浏览器相关，强制指定为英文
 ```
-image: docker.io/anjia0532/google-containers.kubernetes-dashboard-amd64:v1.10.0
+image: docker.io/yuyiyu/google-containers.kubernetes-dashboard-amd64:v1.10.1
 env:
 - name: ACCEPT_LANGUAGE
   value: english
@@ -36,12 +36,13 @@ env:
 kubectl apply -f kubernetes-dashboard.yaml
 ```
 
-## 6、为 dashboard 添加账户
+## 6、为 dashboard 添加权限绑定
+> 默认的 dashboard 用户权限比较低，绑定到集权管理角色中
 
 * vim dashboard-admin.yaml
 
 ```
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: kubernetes-dashboard
@@ -58,7 +59,7 @@ subjects:
 ```
 
 ```
-kubectl create -f dashboard-admin.yaml
+kubectl apply -f dashboard-admin.yaml
 ```
 
 ## 7、获取令牌

@@ -104,8 +104,8 @@ https://github.com/etcd-io/etcd
 
 ```bash
 mkdir /data/k8s/etcd/{bin,cfg,ssl} -p
-tar zxvf etcd-v3.3.10-linux-amd64.tar.gz
-mv etcd-v3.3.10-linux-amd64/{etcd,etcdctl} /data/k8s/etcd/bin/
+tar zxvf etcd-v3.3.15-linux-amd64.tar.gz
+mv etcd-v3.3.15-linux-amd64/{etcd,etcdctl} /data/k8s/etcd/bin/
 ```
 
 # 三、创建etcd配置文件

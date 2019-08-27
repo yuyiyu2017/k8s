@@ -23,9 +23,10 @@
 # 国外镜像处理
 ## 1、国内阿里云镜像仓库
 ```
-image: k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.0
+# 如果不可用，需要自行查找可用国内镜像仓库
+image: k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.1
 修改为
-image: registry.cn-hangzhou.aliyuncs.com/google-containers/kubernetes-dashboard-amd64:v1.10.0
+image: registry.cn-hangzhou.aliyuncs.com/google-containers/kubernetes-dashboard-amd64:v1.10.1
 ```
 
 ## 2、香港自定义镜像
@@ -37,7 +38,7 @@ docker push yuyiyu/google-containers.pause:3.1
 ```
 * 国内下载镜像
 ```
-docker pull yuyiyu/google-containers.pause:3.1
+docker pull docker.io/yuyiyu/google-containers.pause:3.1
 docker tag yuyiyu/google-containers.pause:3.1 k8s.gcr.io/pause:3.1
 docker rmi yuyiyu/google-containers.pause:3.1
 ```

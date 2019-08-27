@@ -28,8 +28,8 @@ set /coreos.com/network/config  '{ "Network": "172.17.0.0/16", "Backend": {"Type
 # 二、下载安装二进制包
 
 ```bash
-wget https://github.com/coreos/flannel/releases/download/v0.10.0/flannel-v0.10.0-linux-amd64.tar.gz
-tar zxvf flannel-v0.9.1-linux-amd64.tar.gz
+wget https://github.com/coreos/flannel/releases/download/v0.11.0/flannel-v0.11.0-linux-amd64.tar.gz
+tar zxvf flannel-v0.11.0-linux-amd64.tar.gz
 mkdir -p /data/k8s/flannel/{bin,cfg}
 mv flanneld mk-docker-opts.sh /data/k8s/flannel/bin
 ```

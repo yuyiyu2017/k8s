@@ -3,7 +3,7 @@
 >
 >kubernetes-server-linux-amd64.tar.gz
 ```bash
-https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG-1.13.md
+https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG-1.15.md
 ```
 ```bash
 mkdir -p /data/k8s/master/{bin,cfg,ssl}
@@ -300,7 +300,7 @@ kubectl create -f anonymous.yaml
 ```
 
 ```
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: open-api
