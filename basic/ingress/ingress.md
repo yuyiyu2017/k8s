@@ -28,31 +28,41 @@ FIELDS:
 ```
 
 # 二、ingress安装
-## 1、安装服务
-```
-wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
+
+## 1、github地址
+> https://github.com/kubernetes/ingress-nginx/blob/master/docs/deploy/index.md
+
+## 2、安装服务
+```bash
+wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
 kubectl apply -f mandatory.yaml
 ```
 
-## 2、 暴露端口
-```
-wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/provider/baremetal/service-nodeport.yaml
+## 3、 暴露端口
+```bash
+wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/baremetal/service-nodeport.yaml
 kubectl apply -f service-nodeport.yaml
 ```
 
-## 3、查看pod是否正确
+## 4、查看pod是否正确
 ```
 kubectl get pods --all-namespaces -l app.kubernetes.io/name=ingress-nginx --watch
+```
+
+## 5、查看ingress暴露的端口
+> 可以修改service-nodeport.yaml，固定ingress的暴露端口
+```
+ingress-nginx   ingress-nginx          NodePort    10.0.0.29    <none>        80:42225/TCP,443:48627/TCP   57s
 ```
 
 # 三、测试验证
 ## 1、创建nginx和apache及对应的service
 
 ```bash
-kubectl run --image=nginx nginx
-kubectl run --image=httpd httpd
-kubectl expose deployment nginx --port=80
-kubectl expose deployment httpd --port=80
+kubectl run --generator=run-pod/v1 --image=nginx nginx
+kubectl run --generator=run-pod/v1 --image=httpd httpd
+kubectl expose pod nginx --port=80
+kubectl expose pod httpd --port=80
 ```
 
 ## 2、创建ingress
@@ -91,6 +101,10 @@ C:\Windows\System32\drivers\etc\hosts
 192.168.112.171 httpd.web.com
 ```
 ## 5、客户端访问两个域名，分别返回nginx和httpd的首页
+```
+nginx.web.com:42225
+httpd.web.com:42225
+```
 
 # 四、查看配置原理
 
