@@ -154,7 +154,7 @@ kubectl apply -f ingress-def.yaml -n dev
 ### 4.3、测试容器
 
 * myapp.yaml
-```
+```yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -165,12 +165,32 @@ spec:
     image: ikubernetes/myapp:v1
 ```
 
-```
+```bash
 kubectl create -f myapp.yaml -n dev
 kubectl create -f myapp.yaml -n prod
 ```
 
 > curl访问Pod地址时，dev的不能访问，prod可以访问
+
+### 4.4、错误处理
+> calico 有些版本缺失 BGPC 配置，需要另行创建
+```yaml
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: bgppeers.crd.projectcalico.org
+spec:
+  scope: Cluster
+  group: crd.projectcalico.org
+  version: v1
+  names:
+    kind: BGPPeer
+    plural: bgppeers
+    singular: bgppeer
+```
+
+
+
 
 
 
