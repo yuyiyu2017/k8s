@@ -39,7 +39,7 @@ Contiv
 Mesos CNI
 ```
 
-# 三、Flannel网络原理
+# 三、Flannel网络
 
 >通过修改docker启动项，给每个节点的docker分配相互不想冲突的IP地址
 >
@@ -51,8 +51,9 @@ Mesos CNI
 ![Alt text](./Flannel数据包.png)
 >Flannel实现过程参照二进制安装
 
-# 四、Calico网络原理
+# 四、Calico网络
 
+## 1、结构说明
 * Felix，Calico Agent
 >跑在每台需要运行Workload的节点上，主要负责配置路由及ACLs等信息来确保Endpoint的连通状态
 * etcd
@@ -64,7 +65,112 @@ Mesos CNI
 ![Alt text](./Calico架构图.png)
 ![Alt text](./Calico网络图.png)
 
+## 2、安装过程
+> https://docs.projectcalico.org/v3.8/getting-started/kubernetes/installation/other
 
+* 使用方式
+```
+1、calico为网络和网络策略
+2、flannel为网络及calico为网络策略
+3、仅安装calico网络策略
+```
+
+* 安装方式
+```
+1、依赖api-server，然后联系etcd运转
+2、另起一套etcd，联系etcd运转
+```
+
+## 3、网络策略写法
+
+* kubectl explain networkpolicy
+
+```tex
+KIND:     NetworkPolicy
+VERSION:  extensions/v1beta1
+
+apiVersion	<string>
+kind	<string>
+metadata	<Object>
+
+spec	<Object>
+    egress	<[]Object>          出栈规则
+        ports	<[]Object>          目标端口列表
+            port	<string>
+            protocol	<string>
+
+        to	<[]Object>              目标地址
+            ipBlock	<Object>
+
+            namespaceSelector	<Object>
+
+            podSelector	<Object>
+
+    ingress	<[]Object>          入栈规则
+        ports	<[]Object>          源端口列表
+            port	<string>
+            protocol	<string>
+
+        from	<[]Object>              源地址
+            ipBlock	<Object>                ip段
+
+            namespaceSelector	<Object>
+
+            podSelector	<Object>
+
+    podSelector	<Object> -required-     应用的Pod
+
+    policyTypes	<[]string>      使用入栈或出栈，或二者都使用
+        Ingress, Egress, or Ingress,Egress
+        如果只定义了Ingress，而policyTypes选择Ingress,Egress，
+        则会应用默认的Egress规则
+```
+
+## 4、网络策略测试
+### 4.1、规则设置
+> 禁止所有访问
+
+* ingress-def.yaml
+```
+apiVersion: extensions/v1beta1
+kind: NetworkPolicy
+metadata:
+    name: deny-all-ingress
+spec:
+    podSelector: {}             # 空代表选择所有
+    policyTypes:
+    - Ingress
+```
+
+### 4.2、创建namespace并应用规则
+```
+kubectl create namespace dev
+kubectl create namespace prod
+
+# -n dev 指定创建在dev名称空间中生效
+kubectl apply -f ingress-def.yaml -n dev
+```
+
+### 4.3、测试容器
+
+* myapp.yaml
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod1
+spec:
+  containers:
+  - name: myapp
+    image: ikubernetes/myapp:v1
+```
+
+```
+kubectl create -f myapp.yaml -n dev
+kubectl create -f myapp.yaml -n prod
+```
+
+> curl访问Pod地址时，dev的不能访问，prod可以访问
 
 
 

@@ -80,7 +80,7 @@ mkdir -p /data/k8s/cfssl/api-cert
 * vim server-csr.json
 >只要使用了api端口，包括etcd、master和负载均衡器及VIP，就需要添加到hosts中
 >
->10.0.0.1 与后续Node中kube-proxy的配置 --cluster-cidr=10.0.0.0/24 相对应
+>10.0.0.1 与后续Node中kube-proxy的配置 --cluster-cidr=10.0.0.0/16 相对应
 
 ```
 {
@@ -139,7 +139,7 @@ KUBE_APISERVER_OPTS="--logtostderr=true \
 --secure-port=6443 \
 --advertise-address=192.168.112.171 \
 --allow-privileged=true \
---service-cluster-ip-range=10.0.0.0/24 \
+--service-cluster-ip-range=10.0.0.0/16 \
 --enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota \
 --authorization-mode=RBAC,Node \
 --enable-bootstrap-token-auth \
@@ -240,7 +240,8 @@ KUBE_CONTROLLER_MANAGER_OPTS="--logtostderr=true \
 --master=127.0.0.1:8080 \
 --leader-elect=true \
 --address=127.0.0.1 \
---service-cluster-ip-range=10.0.0.0/24 \
+--service-cluster-ip-range=10.0.0.0/16 \
+--cluster-cidr=10.10.0.0/16 \
 --cluster-name=kubernetes \
 --cluster-signing-cert-file=/data/k8s/master/ssl/ca.pem \
 --cluster-signing-key-file=/data/k8s/master/ssl/ca-key.pem  \
@@ -278,7 +279,9 @@ kubectl get cs
 ```
 >服务均为 Healthy
 
+
 # 八、Pod操作权限
+
 ## 1、权限报错
 ```bash
 kubectl logs -n kubernetes-dashboard
@@ -293,8 +296,8 @@ authentication:
     enabled: true 
 ```
 
-## 2、应用权限
-* yaml文件创建权限绑定
+## 2、解决方法一应用权限
+* yaml文件方式创建权限绑定
 ```
 kubectl create -f anonymous.yaml
 ```
@@ -303,7 +306,7 @@ kubectl create -f anonymous.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: open-api
+  name: cluster-system-anonymous
   namespace: ""
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -314,7 +317,8 @@ subjects:
     kind: User
     name: system:anonymous
 ```
-* 命令创建权限绑定
+
+* 命令行方式创建权限绑定
 ```
 kubectl create clusterrolebinding cluster-system-anonymous --clusterrole=cluster-admin --user=system:anonymous
 ```
@@ -323,4 +327,63 @@ kubectl create clusterrolebinding cluster-system-anonymous --clusterrole=cluster
 >cluster-admin 为系统的管理权限
 >
 >system:anonymous 为需要绑定的用户为匿名用户
+
+## 3、解决方法二API证书
+
+### 3.1、创建admin证书
+
+* admin-csr.json
+```
+{
+  "CN": "admin",
+  "hosts": [],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "CN",
+      "ST": "BeiJing",
+      "L": "BeiJing",
+      "O": "system:masters",
+      "OU": "System"
+    }
+  ]
+}
+```
+
+* 生成证书
+```
+cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes admin-csr.json | cfssljson -bare admin
+
+cp {admin.pem,admin-key.pem} /data/k8s/master/ssl/
+```
+
+### 3.2、配置 kube-apiserver
+
+* /data/k8s/master/cfg/kube-apiserver
+```
+--kubelet-client-certificate=/data/k8s/master/ssl/admin.pem \
+--kubelet-client-key=/data/k8s/master/ssl/admin-key.pem \
+```
+
+* 重启 kube-apiserver
+```
+systemctl daemon-reload && systemctl restart kube-apiserver && systemctl status kube-apiserver
+```
+ 
+### 3.3、配置kubelet
+> 从master复制apiserver中的ca证书到node上
+
+* /data/k8s/node/cfg/kubelet
+```
+--client-ca-file=/data/k8s/node/ssl/ca.pem \
+```
+
+* 重启 kubelet
+```
+systemctl daemon-reload && systemctl restart kubelet && systemctl status kubelet
+```
+
 

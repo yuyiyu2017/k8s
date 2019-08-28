@@ -232,7 +232,7 @@ rm kubelet-client* kubelet.crt kubelet.key
 KUBE_PROXY_OPTS="--logtostderr=true \
 --v=4 \
 --hostname-override=192.168.112.171 \
---cluster-cidr=10.0.0.0/24 \
+--cluster-cidr=10.10.0.0/16 \
 --kubeconfig=/data/k8s/node/cfg/kube-proxy.kubeconfig"
 ```
 ## 2、添加kube-proxy为系统服务

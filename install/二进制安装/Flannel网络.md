@@ -6,11 +6,11 @@
 /data/k8s/etcd/bin/etcdctl \
 --ca-file=/data/k8s/etcd/ssl/ca.pem --cert-file=/data/k8s/etcd/ssl/server.pem --key-file=/data/k8s/etcd/ssl/server-key.pem \
 --endpoints="https://192.168.112.171:2379,https://192.168.112.172:2379,https://192.168.112.173:2379" \
-set /coreos.com/network/config  '{ "Network": "172.17.0.0/16", "Backend": {"Type": "vxlan"}}'
+set /coreos.com/network/config  '{ "Network": "10.10.0.0/16", "Backend": {"Type": "vxlan"}}'
 ```
 
 ```
-"Network": "172.17.0.0/16"
+"Network": "10.10.0.0/16"
     分配给docker的地址网段
 
 "Backend": {"Type": "vxlan"}
