@@ -216,7 +216,7 @@ done
 # 四、创建集群
 ## 1、创建master
 ```bash
-kubeadm init --kubernetes-version=v1.13.0 --pod-network-cidr=10.244.0.0/16
+kubeadm init --kubernetes-version=v1.15.3 --pod-network-cidr=10.244.0.0/16
 ```
 >--kubernetes-version=           必须指定版本，才会使用本地镜像
 >
@@ -318,15 +318,22 @@ kubeadm init --config kubeadm-init.yaml
 
 # 六、安装 flannel
 
-## 1、下载yaml文件
-
+## 1、单独安装flannel网络
 ```bash
 wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 ```
 
-## 2、创建
 ```
 kubectl apply -f  kube-flannel.yml
+```
+
+## 2、安装flannel网络和calico网络策略(推荐)
+```
+curl https://docs.projectcalico.org/v3.8/manifests/canal.yaml -O
+```
+
+```
+kubectl apply -f  canal.yaml
 ```
 
 ## 3、coreDNS低版本报错
@@ -385,9 +392,17 @@ kubectl get nodes
 kubectl delete node ubuntu64-virtual-machine
 ```
 
-## 5、在从节点上重置集群状态
+## 5、在从节点上重置集群状态(慎用)
 ```bash
 kubeadm reset
+```
+
+## 6、如果删除的是master节点
+```
+master节点也会构建etcd
+如果删除master节点，会导致etcd集群故障
+/var/lib/etcd/
+需测试研究
 ```
 
 # 八、增加master节点
