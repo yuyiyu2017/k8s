@@ -155,4 +155,40 @@ storage.k8s.io/v1beta1
 v1
 ```
 
+## 七、curl使用API方式管理K8S
+> https://kubernetes.io/docs/tasks/administer-cluster/access-cluster-api/
+```bash
+# 临时开启代理
+kubectl proxy --port=50005 &
+
+# 使用API
+curl http://localhost:50005/api/
+
+# API查看
+kubectl api-version
+curl http://localhost:50005/apis/[api-version]
+```
+
+## 八、备忘录
+
+```tex
+重新找grafana的K8S部署
+生产环境中，要修改volumes为持久的存储卷
+```
+
+* 弄清K8S安装中，此操作的意义
+```
+cat > /etc/sysctl.d/k8s.conf <<EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+```
+
+
+
+
+
+
+
+
 
